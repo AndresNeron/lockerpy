@@ -106,7 +106,7 @@ sudo ./locker.py -rd AES_keys/aes_key1.enc -rpem RSA/lock.pem -ad -l samples/pat
 To use this script, clone the GitHub repository and install the necessary dependencies using pip:
 
 ```bash
-git clone https://github.com/yourusername/lockerpy.git
+git clone https://github.com/AndresNeron/lockerpy.git
 cd lockerpy
 pip install -r requirements.txt
 ```
