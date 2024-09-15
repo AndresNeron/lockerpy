@@ -112,9 +112,10 @@ cd lockerpy
 pip install -r requirements.txt
 ```
 
+Protect your files using symmetric (AES) and asymmetric (RSA) algorithms with ease using Lockerpy!
+
 ## <a name="license"></a>License
 
 This project is licensed under the MIT License, which means you are free to use, modify, 
 and distribute the code according to the terms of the license. 
 
-Protect your files using symmetric (AES) and asymmetric (RSA) algorithms with ease using Lockerpy!
