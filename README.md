@@ -1,4 +1,4 @@
-# Locker - Encryption Tool
+# Lockerpy - Encryption Tool
 
 ## Table of Contents
 
