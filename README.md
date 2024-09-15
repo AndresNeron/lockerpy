@@ -12,8 +12,9 @@
 ## <a name="introduction"></a>Introduction
 
 Locker is a versatile encryption tool written in Python. It supports both RSA and AES encryption algorithms, 
-providing functionalities for generating symmetric and asymmetric keys, encrypting/decrypting files, and managing encryption keys. 
-This script is ideal for users who need to secure their data or handle encryption in various cyber offensive workflows.
+providing functionalities for generating symmetric and asymmetric keys, encrypting/decrypting files in the host system, 
+and managing encryption keys. 
+This program is ideal for users who need to secure their data or handle encryption in various cyber offensive workflows.
 
 ## <a name="features"></a>Features
 
