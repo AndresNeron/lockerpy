@@ -48,7 +48,7 @@ Here are the available options for the script:
 - -ae, --aes_encrypt: Encrypt a file using AES with the decrypted symmetric key.
 - -ad, --aes_decrypt: Decrypt a file using AES.
 
-<a name="examples"></a>Examples
+## <a name="examples"></a>Examples
 
 Here are some examples of how to use the script:
 
@@ -102,7 +102,7 @@ sudo ./locker.py -rd AES_keys/aes_key1.enc -rpem RSA/lock.pem -ad -l samples/pat
 
 - Logging: The key_logs.csv file will log which files were encrypted and which key was used for further decryption purposes.
 
-<a name="installation"></a>Installation
+## <a name="installation"></a>Installation
 
 To use this script, clone the GitHub repository and install the necessary dependencies using pip:
 
@@ -112,7 +112,7 @@ cd lockerpy
 pip install -r requirements.txt
 ```
 
-<a name="license"></a>License
+## <a name="license"></a>License
 
 This project is licensed under the MIT License, which means you are free to use, modify, 
 and distribute the code according to the terms of the license. 
