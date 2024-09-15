@@ -59,7 +59,7 @@ if __name__ == '__main__':
 
 
     # Print the decrypted code
-    print("[!] Encrypted content:")
+    print("[!] Decrypted content:")
     print("'")
     print(decrypted_code)
     print("'")
