@@ -1,6 +1,4 @@
-# Locker - Python-based Encryption Tool
-
-The Locker script provides a powerful set of encryption and decryption tools using RSA and AES algorithms. It allows users to generate keys, encrypt and decrypt files, and manage encryption workflows efficiently.
+# Locker - Encryption Tool
 
 ## Table of Contents
 
@@ -13,7 +11,9 @@ The Locker script provides a powerful set of encryption and decryption tools usi
 
 ## <a name="introduction"></a>Introduction
 
-Locker is a versatile encryption tool written in Python. It supports both RSA and AES encryption algorithms, providing functionalities for generating keys, encrypting/decrypting files, and managing encryption keys. This script is ideal for users who need to secure their data or handle encryption in various workflows.
+Locker is a versatile encryption tool written in Python. It supports both RSA and AES encryption algorithms, 
+providing functionalities for generating symmetric and asymmetric keys, encrypting/decrypting files, and managing encryption keys. 
+This script is ideal for users who need to secure their data or handle encryption in various workflows.
 
 ## <a name="features"></a>Features
 
@@ -115,4 +115,4 @@ pip install -r requirements.txt
 This project is licensed under the MIT License, which means you are free to use, modify, 
 and distribute the code according to the terms of the license. 
 
-Enjoy secure encryption with Lockerpy!
+Protect your files using symmetric (AES) and asymmetric (RSA) algorithms with ease using Lockerpy!
