@@ -24,6 +24,21 @@ This program is ideal for users who need to secure their data or manage encrypti
 - **Batch Processing**: Encrypt or decrypt multiple files listed in a text file.
 - **Logging**: Track encryption activities in `key_logs.csv` for future reference.
 
+
+## <a name="installation"></a>Installation
+
+To use this script, clone the GitHub repository and install the necessary dependencies using pip:
+
+```bash
+git clone https://github.com/AndresNeron/lockerpy.git
+cd lockerpy
+pip install -r requirements.txt
+```
+
+Protect your code using symmetric (AES) and asymmetric (RSA) algorithms with ease using Lockerpy!
+The encrypted binary data is base64 encoded after AES encryption. You can decrypt your AES key using your RSA private key to finally 
+decrypt your file.
+
 ## <a name="usage"></a>Usage
 
 To use the Locker script, execute it from the terminal with various options to perform encryption and decryption tasks:
@@ -102,19 +117,6 @@ sudo ./locker.py -rd AES_keys/aes_key1.enc -rpem RSA/lock.pem -ad -l samples/pat
 
 - Logging: The key_logs.csv file will log which files were encrypted and which key was used for further decryption purposes.
 
-## <a name="installation"></a>Installation
-
-To use this script, clone the GitHub repository and install the necessary dependencies using pip:
-
-```bash
-git clone https://github.com/AndresNeron/lockerpy.git
-cd lockerpy
-pip install -r requirements.txt
-```
-
-Protect your code using symmetric (AES) and asymmetric (RSA) algorithms with ease using Lockerpy!
-The encrypted binary data is base64 encoded after AES encryption. You can decrypt your AES key using your RSA private key to finally 
-decrypt your file.
 
 ## <a name="license"></a>License
 
