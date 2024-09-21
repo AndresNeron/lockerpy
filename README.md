@@ -4,9 +4,9 @@
 
 - [Introduction](#introduction)
 - [Features](#features)
+- [Installation](#installation)
 - [Usage](#usage)
 - [Examples](#examples)
-- [Installation](#installation)
 - [License](#license)
 
 ## <a name="introduction"></a>Introduction
@@ -112,10 +112,11 @@ cd lockerpy
 pip install -r requirements.txt
 ```
 
-Protect your files using symmetric (AES) and asymmetric (RSA) algorithms with ease using Lockerpy!
+Protect your code using symmetric (AES) and asymmetric (RSA) algorithms with ease using Lockerpy!
+The encrypted binary data is base64 encoded after AES encryption. You can decrypt your AES key using your RSA private key to finally 
+decrypt your file.
 
 ## <a name="license"></a>License
 
 This project is licensed under the MIT License, which means you are free to use, modify, 
 and distribute the code according to the terms of the license. 
-
