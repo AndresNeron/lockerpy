@@ -17,6 +17,10 @@ as well as encrypting and decrypting files on the host system.
 Additionally, Lockerpy compresses files before encryption to save space. 
 This program is ideal for users who need to secure their data or manage encryption within various cybersecurity workflows.
 
+Protect your code using symmetric (AES) and asymmetric (RSA) algorithms with ease using Lockerpy!
+The encrypted binary data is base64 encoded after AES encryption. You can decrypt your AES key using your RSA private key to finally 
+decrypt your file.
+
 ## <a name="features"></a>Features
 
 - **Generate Keys**: Create new AES and RSA keys for encryption.
@@ -34,10 +38,6 @@ git clone https://github.com/AndresNeron/lockerpy.git
 cd lockerpy
 pip install -r requirements.txt
 ```
-
-Protect your code using symmetric (AES) and asymmetric (RSA) algorithms with ease using Lockerpy!
-The encrypted binary data is base64 encoded after AES encryption. You can decrypt your AES key using your RSA private key to finally 
-decrypt your file.
 
 ## <a name="usage"></a>Usage
 
