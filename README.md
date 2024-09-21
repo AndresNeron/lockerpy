@@ -17,7 +17,7 @@ as well as encrypting and decrypting files on the host system.
 Additionally, Lockerpy compresses files before encryption to save space. 
 This program is ideal for users who need to secure their data or manage encryption within various cybersecurity workflows.
 
-Protect your code using symmetric (AES) and asymmetric (RSA) algorithms with ease using Lockerpy!
+Protect your code, copyright-content and private files with ease using Lockerpy!
 The encrypted binary data is base64 encoded after AES encryption. You can decrypt your AES key using your RSA private key to finally 
 decrypt your file.
 
