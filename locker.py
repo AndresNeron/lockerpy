@@ -88,7 +88,7 @@ def compress_gzip(input_file):
 def aes_treat_file(args, symmetric_key, path, enc_path):
     
     if path and not os.path.exists(path):
-        print(Colors.RED + "[x] Desired path doesn't exist in the system." + Colors.R)
+        #print(Colors.RED + "[x] Listed path doesn't exist in the system. Skipping..." + Colors.R)
         return
 
     ## Case for encrypting using AES and decrypted symmetric key.
@@ -126,17 +126,18 @@ def aes_treat_file(args, symmetric_key, path, enc_path):
                 decompressed_content = gz.read()
             
             # Save the decrypted file without the '.gz.bin' termination
-            decrypted_file = path[:-7]
-            with open(decrypted_file, 'wb') as file:
-                file.write(decompressed_content)
+            #decrypted_file = path[:-7]
+            #with open(decrypted_file, 'wb') as file:
+            #    file.write(decompressed_content)
             
-            print(Colors.GREEN + f"\n[!] Decrypted result saved into:\t{decrypted_file}\n" + Colors.R)
+            #print(Colors.GREEN + f"\n[!] Decrypted result saved into:\t{decrypted_file}\n" + Colors.R)
+            print(Colors.GREEN + f"\n[!] Decrypted content from {path} is:\n{Colors.ORANGE}{decompressed_content.decode()}\n" + Colors.R)
         
         except Exception as e:
             print(Colors.RED + f"[-] Error: {e}" + Colors.R)
 
         # Delete the path file and preserve the decrypted version
-        delete_file(path)
+        #delete_file(path)
 
 
 def main():
@@ -214,7 +215,7 @@ def main():
 
         # Decrypt using RSA
         symmetric_key = rsa_decrypt(private_key, encrypted_code)
-        print("[!] RSA decryption sucess!")
+        print(f"{Colors.GREEN}[!] RSA decryption sucess!{Colors.R}")
 
         # When -p is provided apply the workflow for a single file
         if args.path:
