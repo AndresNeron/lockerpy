@@ -5,7 +5,7 @@
 set -e
 
 # Required system packages
-REQUIRED_PACKAGES=(git python3 virtualenv)
+REQUIRED_PACKAGES=(git python3 virtualenv sudo)
 
 echo "[+] Installing required packages..."
 sudo apt update || true
