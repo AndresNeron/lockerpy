@@ -15,6 +15,10 @@ Lockerpy is a versatile encryption tool written in Python. It supports both AES 
 offering features for generating symmetric (AES) and asymmetric (RSA) keys, 
 as well as encrypting and decrypting files on the host system. 
 Additionally, Lockerpy compresses files before encryption to save space. 
+
+Additionally, data always remains encrypted in disk. Decrypted data only is stored temporaly in RAM during runtime. After that
+zeros are written into blocks of memory that were used for storing the decrypted content.
+
 This program is ideal for users who need to secure their data or manage encryption within various cybersecurity workflows.
 
 ## <a name="features"></a>Features
@@ -94,13 +98,11 @@ sudo ./locker.py -rd AES_keys/aes_key1.enc -rpem RSA/lock.pem -ad -p books/impor
 sudo ./locker.py -rd AES_keys/aes_key1.enc -rpem RSA/lock.pem -ae -l samples/paths_for_encryption
 ```
 
-- Decrypt an AES key and then decrypt a list of paths using AES:
+- Decrypt an AES key using RSA and then decrypt a list of paths using AES:
 
 ```bash
 sudo ./locker.py -rd AES_keys/aes_key1.enc -rpem RSA/lock.pem -ad -l samples/paths_for_decryption
 ```
-
-- Logging: The key_logs.csv file will log which files were encrypted and which key was used for further decryption purposes.
 
 ## <a name="installation"></a>Installation
 

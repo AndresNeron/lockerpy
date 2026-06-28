@@ -138,6 +138,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    #print("FLAG")
-    #rsa_generate_keys("keys")
-

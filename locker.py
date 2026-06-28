@@ -100,11 +100,6 @@ def aes_treat_file(args, symmetric_key, path, enc_path):
         # Encrypt the file using AES
         aes_encrypt_file(symmetric_key, path_gz)
 
-        # Log which aes_key was used for encrypting the file
-        log_file = os.getcwd() + "/key_logs.csv"
-        with open(log_file, 'a') as file:
-            file.write(f"AES,encryption,{enc_path},{path_gz}\n")
-
         # Delete the old paths and preserve the encrypted version
         delete_file(path)
         delete_file(path_gz)
@@ -114,11 +109,6 @@ def aes_treat_file(args, symmetric_key, path, enc_path):
         
         # The return of this decryption is a bytes type object
         decrypted_content = aes_decrypt_file(symmetric_key, path)
-
-        # Log which aes_key was used for decrypting the file
-        log_file = os.getcwd() + "/key_logs.csv"
-        with open(log_file, 'a') as file:
-            file.write(f"AES,decryption,{enc_path},{path}\n")
 
         try:
             # Decompress the data if it is gzip-compressed
@@ -131,7 +121,7 @@ def aes_treat_file(args, symmetric_key, path, enc_path):
             #    file.write(decompressed_content)
             
             #print(Colors.GREEN + f"\n[!] Decrypted result saved into:\t{decrypted_file}\n" + Colors.R)
-            print(Colors.GREEN + f"\n[!] Decrypted content from {path} is:\n{Colors.ORANGE}{decompressed_content.decode()}\n" + Colors.R)
+            print(Colors.GREEN + f"\n[!] Decrypted content from {path} is:\n{Colors.R}{decompressed_content.decode()}\n" + Colors.R)
         
         except Exception as e:
             print(Colors.RED + f"[-] Error: {e}" + Colors.R)
@@ -182,11 +172,6 @@ def main():
 
         # Encrypt args.rsa_encrypt using RSA
         rsa_encrypt_path(public_key, args.rsa_encrypt, enc_path)
-
-        # Log which public key was used for encrypting AES key
-        log_file = os.getcwd() + "/key_logs.csv"
-        with open(log_file, 'a') as file:
-            file.write(f"{public_key_path},{enc_path}\n")
 
         # Delete old payload path and preserve only the new enc_path
         delete_file(args.rsa_encrypt)
