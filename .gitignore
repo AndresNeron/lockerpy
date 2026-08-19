@@ -8,3 +8,6 @@
 *enc_paths*
 *payload*
 cipher.sh
+*.env
+*cache*
+*log
