@@ -4,14 +4,17 @@ import os
 import base64
 import gzip
 from io import BytesIO
+from pathlib import Path
 from dotenv import load_dotenv
 
-# Load environment variables from local or project .env
-load_dotenv()
+
+# Forcefully point to your absolute project sync directory
+env_path = Path("/home/ainode/Sync/lockerpy/.env")
+load_dotenv(dotenv_path=env_path)
 
 # Internal lockerpy modules
-from RSA.decryption_rsa import load_private_key, load_encrypted_code, rsa_decrypt
-from AES.decryption_aes import aes_decrypt_file
+from lockerpy.RSA.decryption_rsa import load_private_key, load_encrypted_code, rsa_decrypt
+from lockerpy.AES.decryption_aes import aes_decrypt_file
 
 def runtime_decrypt_secret(enc_file_path: str = ".env.gz.enc") -> str:
     """
@@ -43,7 +46,7 @@ def runtime_decrypt_secret(enc_file_path: str = ".env.gz.enc") -> str:
         private_key_pem = f.read()
     
     private_key = load_private_key(private_key_pem)
-    encrypted_symmetric_code = load_encrypted_code(enc_path=enc_sym_key_path)
+    encrypted_symmetric_code = load_encrypted_code(enc_sym_key_path)
     symmetric_key = rsa_decrypt(private_key, encrypted_symmetric_code)
 
     # 3. Decrypt the target secret file using the decrypted AES key
@@ -56,3 +59,21 @@ def runtime_decrypt_secret(enc_file_path: str = ".env.gz.enc") -> str:
         decompressed_content = gz.read()
 
     return decompressed_content.decode('utf-8')
+
+
+def load_secret(enc_file_path: str = ".env.gz.enc") -> None:
+    """
+    Decrypts the secret file and loads its key-value pairs directly 
+    into os.environ at runtime.
+    
+    :param enc_file_path: Path to the encrypted file (defaults to '.env.gz.enc')
+    """
+    try:
+        env_data = runtime_decrypt_secret(enc_file_path)
+        for line in env_data.splitlines():
+            if '=' in line and not line.startswith('#'):
+                key, val = line.split('=', 1)
+                os.environ[key.strip()] = val.strip()
+    except Exception as e:
+        print(f"[-] Decryption failed: {e}")
+        raise

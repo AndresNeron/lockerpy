@@ -10,20 +10,25 @@ import shutil
 import base64
 import argparse
 from io import BytesIO
+from pathlib import Path
 from dotenv import load_dotenv
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives.asymmetric import padding
 
 # Load environment variables from .env file
-load_dotenv()
+script_dir = Path(__file__).resolve().parent
+env_path = script_dir / "../../.env"
+
+# Load environment variables from the calculated relative path
+load_dotenv(dotenv_path=env_path)
 
 # Personal packages
-from utils.colors import Colors
-from RSA.encryption_rsa import rsa_generate_keys, rsa_encrypt_path
-from RSA.decryption_rsa import load_private_key, load_encrypted_code, rsa_decrypt
-from AES.encryption_aes import aes_generate_key, aes_encrypt_file
-from AES.decryption_aes import aes_decrypt_file
+from lockerpy.utils.colors import Colors
+from lockerpy.RSA.encryption_rsa import rsa_generate_keys, rsa_encrypt_path
+from lockerpy.RSA.decryption_rsa import load_private_key, load_encrypted_code, rsa_decrypt
+from lockerpy.AES.encryption_aes import aes_generate_key, aes_encrypt_file
+from lockerpy.AES.decryption_aes import aes_decrypt_file
 
 # Function to parse command-line arguments
 def parse_arguments():

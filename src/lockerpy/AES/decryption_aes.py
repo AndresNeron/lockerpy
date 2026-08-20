@@ -12,7 +12,7 @@ from cryptography.hazmat.backends import default_backend
 load_dotenv()
 
 # Personal packages
-from utils.colors import Colors
+from lockerpy.utils.colors import Colors
 
 # Function to load the AES key and encrypted message from files
 def load_from_files(key_path, enc_message_path):

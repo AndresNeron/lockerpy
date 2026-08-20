@@ -15,7 +15,12 @@ dependencies = [
     "pycryptodome>=3.21.0",
 ]
 
+[project.scripts]
+locker = "lockerpy.locker:main"
+
 [tool.setuptools.packages.find]
+where = ["src"]
+include = ["lockerpy*"]
 exclude = [
     "cipherEnv*",
     "*.tests*",

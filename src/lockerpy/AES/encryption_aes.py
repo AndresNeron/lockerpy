@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 
+# This code implement various workflows for encryption purposes.
+# It is possible to encrypt a complete file system using this script.
+
 import os
 import sys
 import gzip
@@ -14,7 +17,8 @@ from cryptography.hazmat.backends import default_backend
 load_dotenv()
 
 # Personal packages
-from utils.colors import Colors
+from lockerpy.utils.colors import Colors
+
 
 # Function to generate a random AES key
 def aes_generate_key():
@@ -63,7 +67,6 @@ def save_to_files(key, encrypted_message, key_path, enc_message_path):
 
 # Method for encrypting a complete file using AES
 def aes_encrypt_file(key, file_path):
-
     if os.path.exists(file_path):
         # Read the plaintext message from a file
         with open(file_path, 'rb') as file:
