@@ -8,7 +8,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 
-# Forcefully point to your absolute project sync directory
+# Forcefully point to absolute module directory
 env_path = (Path.cwd() / "../../.env").resolve()
 
 load_dotenv(dotenv_path=env_path)
