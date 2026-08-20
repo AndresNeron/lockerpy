@@ -9,7 +9,8 @@ from dotenv import load_dotenv
 
 
 # Forcefully point to your absolute project sync directory
-env_path = Path("/home/ainode/Sync/lockerpy/.env")
+env_path = (Path.cwd() / "../../.env").resolve()
+
 load_dotenv(dotenv_path=env_path)
 
 # Internal lockerpy modules
