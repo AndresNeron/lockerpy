@@ -3,9 +3,13 @@
 import os
 import sys
 import base64
+from dotenv import load_dotenv
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives import padding as sym_padding
 from cryptography.hazmat.backends import default_backend
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Personal packages
 from utils.colors import Colors
@@ -54,30 +58,32 @@ def aes_decrypt_file(key, encrypted_file):
         # Decrypt the bytes encrypted content
         decrypted_content = decrypt_message(key, encrypted_content)
         
-        ## This lines are not necessary when the file was decompressed
-        #decrypted_content = decrypted_content.decode()
-
-        # Save the decrypted file without the '.bin' termination
-        #decrypted_file = encrypted_file[:-4]
-        #with open(decrypted_file, 'w') as file:
-        #    file.write(decrypted_content)
-        #    print(Colors.GREEN + f"\n[!] Decrypted result saved into:\t{decrypted_file}\n" + Colors.R)
-            #print(decrypted_content)
-
         return decrypted_content
 
 
 # Main script
 if __name__ == "__main__":
-    if len(sys.argv) != 3:
-        print("Usage: python3 decrypt_aes.py <key_file_path> <encrypted_message_file_path>")
+    if len(sys.argv) != 2:
+        print("Usage: python3 decryption_aes.py <encrypted_message_file_path>")
         sys.exit(1)
 
-    key_file_path = sys.argv[1]
-    encrypted_message_file_path = sys.argv[2]
+    encrypted_message_file_path = sys.argv[1]
 
-    if os.path.exists(encrypted_message_file_path) is False:
-        os.mkdir(encrypted_message_file_path)
+    # Load AES key path from environment variable and expand '~'
+    key_env = os.getenv("AES_KEY_PATH")
+    if not key_env:
+        print("[!] Error: AES_KEY_PATH is not set in the .env file.")
+        sys.exit(1)
+    
+    key_file_path = os.path.expanduser(key_env)
+
+    if not os.path.exists(key_file_path):
+        print(f"[!] Error: AES key file does not exist at: {key_file_path}")
+        sys.exit(1)
+
+    if not os.path.exists(encrypted_message_file_path):
+        print(f"[!] Error: Encrypted message file does not exist at: {encrypted_message_file_path}")
+        sys.exit(1)
 
     # Load the AES key and encrypted message from files
     key, encrypted_message = load_from_files(key_file_path, encrypted_message_file_path)
@@ -89,4 +95,3 @@ if __name__ == "__main__":
     print("[!] Decrypted code: \n")
     decoded_code = decrypted_message.decode('utf-8')
     print(decoded_code)
-    #exec(decoded)

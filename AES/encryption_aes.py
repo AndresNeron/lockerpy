@@ -5,9 +5,13 @@ import sys
 import gzip
 import shutil
 import base64
+from dotenv import load_dotenv
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives import padding as sym_padding
 from cryptography.hazmat.backends import default_backend
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Personal packages
 from utils.colors import Colors
@@ -74,7 +78,6 @@ def aes_encrypt_file(key, file_path):
 
         # Encode the encrypted content again
         encrypted_content = base64.b64encode(encrypted_content).decode('utf-8')
-        #print(encrypted_content)
 
         # Save the encrypted file
         encrypted_file = file_path + ".bin"
@@ -85,19 +88,29 @@ def aes_encrypt_file(key, file_path):
 
 # Main script
 if __name__ == "__main__":
-    if len(sys.argv) != 3:
-        print("Usage: ./encrypt_aes.py <payload_path> <output_directory_path>")
+    if len(sys.argv) != 2:
+        print("Usage: ./encryption_aes.py <payload_path>")
         sys.exit(1)
 
     input_file_path = sys.argv[1]
-    sample_path = sys.argv[2]
-    basename = os.path.basename(sample_path)
 
-    if os.path.exists(sample_path) is False:
-        os.mkdir(sample_path)
+    if not os.path.exists(input_file_path):
+        print(f"[!] Error: Payload path does not exist: {input_file_path}")
+        sys.exit(1)
 
-    key_file_path = sample_path + '/' + basename + '_aes_key.bin'
-    encrypted_message_file_path = sample_path + '/' + basename + "_aes.bin"
+    # Load AES key path from environment variable and expand '~'
+    key_env = os.getenv("AES_KEY_PATH")
+    if not key_env:
+        print("[!] Error: AES_KEY_PATH is not set in the .env file.")
+        sys.exit(1)
+    
+    key_file_path = os.path.expanduser(key_env)
+    key_dir = os.path.dirname(key_file_path)
+
+    if key_dir and not os.path.exists(key_dir):
+        os.makedirs(key_dir, exist_ok=True)
+
+    encrypted_message_file_path = input_file_path + ".bin"
 
     # Read the plaintext message from a file
     with open(input_file_path, 'rb') as file:
@@ -116,5 +129,3 @@ if __name__ == "__main__":
     print("[!] Encryption complete.\n")
     print(f"[!] key : {key_file_path}")
     print(f"[!] enc : {encrypted_message_file_path}")
-
-

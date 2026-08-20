@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=61.0.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "lockerpy"
+version = "1.0.0"
+description = "A Python-based encryption application utilizing AES and RSA algorithms."
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "cffi>=1.17.1",
+    "cryptography>=44.0.0",
+    "pycparser>=2.22",
+    "pycryptodome>=3.21.0",
+]
+
+[tool.setuptools.packages.find]
+exclude = [
+    "cipherEnv*",
+    "*.tests*",
+]

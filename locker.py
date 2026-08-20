@@ -10,9 +10,13 @@ import shutil
 import base64
 import argparse
 from io import BytesIO
+from dotenv import load_dotenv
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives.asymmetric import padding
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Personal packages
 from utils.colors import Colors
@@ -24,40 +28,19 @@ from AES.decryption_aes import aes_decrypt_file
 # Function to parse command-line arguments
 def parse_arguments():
     parser = argparse.ArgumentParser(description="[!] Locker - A Python-based tool for encryption operations.")
-    parser.add_argument("-p",   "--path",           help="\t\tPath to file for encryption or decryption.")
-    parser.add_argument("-l",   "--list",           help="\t\tPath to file with list for encryption or decryption.")
-    parser.add_argument("-ag",   "--aes_gen",       help="\t\tPath to new AES key.")
-    parser.add_argument("-rg",   "--rsa_gen",       help="\t\tPath to new RSA key pair.")
+    parser.add_argument("-p",   "--path",         help="\t\tPath to file for encryption or decryption.")
+    parser.add_argument("-l",   "--list",         help="\t\tPath to file with list for encryption or decryption.")
+    parser.add_argument("-ag",  "--aes_gen",      help="\t\tPath to new AES key.")
+    parser.add_argument("-rg",  "--rsa_gen",      help="\t\tPath to new RSA key pair.")
     
     parser.add_argument("-re",  "--rsa_encrypt",    help="\t\tPath to plain text symmetric key.")
     parser.add_argument("-rpub","--rsa_public",     help="\t\tPath to public key path for RSA encryption.")
 
-    parser.add_argument("-rd",  "--rsa_decrypt",    help="\t\tPath to encrypted symmetric key.")
-    parser.add_argument("-rpem","--rsa_private",    help="\t\tPath to private key for RSA decryption.")
+    parser.add_argument("-rd",  "--rsa_decrypt",    nargs="?", const="ENV", help="\t\tPath to encrypted symmetric key (or uses .env if omitted).")
+    parser.add_argument("-rpem","--rsa_private",    nargs="?", const="ENV", help="\t\tPath to private key for RSA decryption (or uses .env if omitted).")
 
     parser.add_argument("-ae",  "--aes_encrypt", action="store_true", help="\t\tFile to encrypt using AES algorithm and decrypted symmetric key.")
     parser.add_argument("-ad",  "--aes_decrypt", action="store_true", help="\t\tFile to decrypt using AES algorithm.")
-
-    # Some execution examples
-    
-    # Generate new AES key
-    ## sudo ./locker.py -ag AES_keys/aes_key1
-
-    # Generate new RSA key
-    ## sudo ./locker.py -rg RSA/lock             # This command generate a new RSA key pair
-
-    # RSA algorithms
-    ## sudo ./locker.py -re AES_keys/aes_key1       -rpub RSA/lock_pem.pub  # This command encrypt an AES key using RSA
-    ## sudo ./locker.py -rd AES_keys/aes_key1.enc   -rpem RSA/lock.pem      # This command decrypts an AES key using RSA
-
-    # AES algorithms
-    ## sudo ./locker.py -rd AES_keys/aes_key1.enc   -rpem RSA/lock.pem -ae -p payloads/malware.py      # This command decrypts an AES key with RSA and then encrypts a file using AES
-    ## sudo ./locker.py -rd AES_keys/aes_key1.enc   -rpem RSA/lock.pem -ad -p payloads/malware.py.bin  # This command decrypts and AES key with RSA and then decrypt a file using AES
-
-    ## sudo ./locker.py -rd AES_keys/aes_key1.enc   -rpem RSA/lock.pem -ae -l samples/paths_for_encryption      # This command decrypts an AES key with RSA and then encrypts a list of paths in the system using AES
-    ## sudo ./locker.py -rd AES_keys/aes_key1.enc   -rpem RSA/lock.pem -ad -l samples/paths_for_decryption      # This command decrypts an AES key with RSA and then encrypts a list of paths in the system using AES
-
-    # In the 'key_logs.csv' file will be logged which files were encrypted and which key was used, for further decryption purposes.
 
     return parser.parse_args()
 
@@ -88,136 +71,109 @@ def compress_gzip(input_file):
 def aes_treat_file(args, symmetric_key, path, enc_path):
     
     if path and not os.path.exists(path):
-        #print(Colors.RED + "[x] Listed path doesn't exist in the system. Skipping..." + Colors.R)
         return
 
     ## Case for encrypting using AES and decrypted symmetric key.
     if args.aes_encrypt and path:
-
-        # Compress the file before encryption
         path_gz = compress_gzip(path)
-
-        # Encrypt the file using AES
         aes_encrypt_file(symmetric_key, path_gz)
-
-        # Delete the old paths and preserve the encrypted version
         delete_file(path)
         delete_file(path_gz)
 
     ## Case for decryption using AES and decrypted symmetric key. 
     elif args.aes_decrypt and path:
-        
-        # The return of this decryption is a bytes type object
         decrypted_content = aes_decrypt_file(symmetric_key, path)
 
         try:
-            # Decompress the data if it is gzip-compressed
             with gzip.GzipFile(fileobj=BytesIO(decrypted_content)) as gz:
                 decompressed_content = gz.read()
             
-            # Save the decrypted file without the '.gz.bin' termination
-            #decrypted_file = path[:-7]
-            #with open(decrypted_file, 'wb') as file:
-            #    file.write(decompressed_content)
-            
-            #print(Colors.GREEN + f"\n[!] Decrypted result saved into:\t{decrypted_file}\n" + Colors.R)
             print(Colors.GREEN + f"\n[!] Decrypted content from {path} is:\n{Colors.R}{decompressed_content.decode()}\n" + Colors.R)
         
         except Exception as e:
             print(Colors.RED + f"[-] Error: {e}" + Colors.R)
 
-        # Delete the path file and preserve the decrypted version
-        #delete_file(path)
-
 
 def main():
-    # Parse command-line arguments
     args = parse_arguments()
 
     # Generate a new symmetric AES key
     if args.aes_gen:
         key = aes_generate_key()
-
-        # Save new generated key to a file
         key_base64 = base64.b64encode(key).decode('utf-8')
         with open(args.aes_gen, 'w') as file:
             file.write(key_base64)
             print(Colors.GREEN + f"[!] Key created successfully and saved into:\n{args.aes_gen}" + Colors.R)
-
         sys.exit(0)
 
     # Generate a new RSA key pair
     if args.rsa_gen:
-        # Use rsa_gen arguments as key pattern
         rsa_generate_keys(args.rsa_gen)
-
         sys.exit(0)
 
-    # Case for RSA encryption (usually a single AES key)
+    # Case for RSA encryption
     if args.rsa_encrypt and args.rsa_public:
-        # Setup path variables
-        args.rsa_encrypt = args.rsa_encrypt
         enc_path = args.rsa_encrypt + ".enc"
         public_key_path = args.rsa_public
 
         if not os.path.exists(public_key_path):
             sys.exit(0)
 
-        # Read the public key
         with open(public_key_path, 'rb') as file:
             public_key = file.read()
 
-        # Serialize to get the public key
         public_key = serialization.load_pem_public_key(public_key)
-
-        # Encrypt args.rsa_encrypt using RSA
         rsa_encrypt_path(public_key, args.rsa_encrypt, enc_path)
-
-        # Delete old payload path and preserve only the new enc_path
         delete_file(args.rsa_encrypt)
-
-        # Finish the encryption of the symmetric key
         sys.exit(0)
 
+    # Case for RSA decryption & AES Operations
+    if (args.rsa_decrypt is not None or args.aes_decrypt or args.aes_encrypt) and not args.rsa_encrypt:
+        
+        # Resolve Encrypted Symmetric Key path (Fix: do not append .enc twice)
+        if args.rsa_decrypt == "ENV" or args.rsa_decrypt is None:
+            enc_path_env = os.getenv("AES_KEY_PATH")
+            if not enc_path_env:
+                print(Colors.RED + "[x] Error: AES_KEY_PATH not found in environment." + Colors.R)
+                sys.exit(1)
+            enc_path = os.path.expanduser(enc_path_env)
+        else:
+            enc_path = args.rsa_decrypt
 
-    # Case for RSA decryption
-    if args.rsa_decrypt and args.rsa_private and not args.rsa_encrypt:
-        if not os.path.exists(args.rsa_decrypt) or not os.path.exists(args.rsa_private):
-            print(Colors.RED + "[x] Invalid input paths for RSA decryption." + Colors.R)
-            sys.exit(0)
+        # Resolve Private RSA Key path
+        if args.rsa_private == "ENV" or args.rsa_private is None:
+            private_key_env = os.getenv("RSA_KEY_PATH")
+            if not private_key_env:
+                print(Colors.RED + "[x] Error: RSA_KEY_PATH not found in environment." + Colors.R)
+                sys.exit(1)
+            private_key_path = os.path.expanduser(private_key_env)
+        else:
+            private_key_path = args.rsa_private
 
-        # Assign variables
-        enc_path            = args.rsa_decrypt
-        private_key_path    = args.rsa_private
+        if not os.path.exists(enc_path) or not os.path.exists(private_key_path):
+            print(Colors.RED + f"[x] Invalid input paths for RSA decryption.\nEncrypted Key: {enc_path}\nPrivate Key: {private_key_path}" + Colors.R)
+            sys.exit(1)
 
         # Read the private key
         with open(private_key_path, 'rb') as file:
             private_key_pem = file.read()
 
-        # Load the private key and encrypted file
         private_key = load_private_key(private_key_pem)
         encrypted_code = load_encrypted_code(enc_path)
 
-        # Decrypt using RSA
+        # Decrypt symmetric key using RSA
         symmetric_key = rsa_decrypt(private_key, encrypted_code)
-        print(f"{Colors.GREEN}[!] RSA decryption sucess!{Colors.R}")
+        print(f"{Colors.GREEN}[!] RSA decryption success!{Colors.R}")
 
-        # When -p is provided apply the workflow for a single file
+        # When -p is provided apply workflow for a single file
         if args.path:
             aes_treat_file(args, symmetric_key, args.path, enc_path)
 
-        # When -l is provided apply the workflow to each file in args.list
+        # When -l is provided apply workflow to each file in args.list
         elif args.list is not None and os.path.exists(args.list):
-
             with open(args.list, 'r') as file:
                 for path in file:
-                    # Setup each path
                     path = path.strip()
-                    #path = os.path.join(os.getcwd(), path)
-                    #path = os.getcwd() + "/" + path
-                    #print(path)
-
-                    # Apply workflow for a single file
                     aes_treat_file(args, symmetric_key, path, enc_path)
 
 
