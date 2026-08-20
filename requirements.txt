@@ -1,4 +1,7 @@
 cffi==2.0.0
 cryptography==46.0.1
+dotenv==0.9.9
+-e git+ssh://git@github.com/AndresNeron/lockerpy.git@ae0faeb32f8244d089718a2e3686be55c4173635#egg=lockerpy
 pycparser==2.23
 pycryptodome==3.23.0
+python-dotenv==1.2.3
