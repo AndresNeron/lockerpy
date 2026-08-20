@@ -33,10 +33,10 @@ from lockerpy.AES.decryption_aes import aes_decrypt_file
 # Function to parse command-line arguments
 def parse_arguments():
     parser = argparse.ArgumentParser(description="[!] Locker - A Python-based tool for encryption operations.")
-    parser.add_argument("-p",   "--path",         help="\t\tPath to file for encryption or decryption.")
-    parser.add_argument("-l",   "--list",         help="\t\tPath to file with list for encryption or decryption.")
-    parser.add_argument("-ag",  "--aes_gen",      help="\t\tPath to new AES key.")
-    parser.add_argument("-rg",  "--rsa_gen",      help="\t\tPath to new RSA key pair.")
+    parser.add_argument("-p",   "--path",        help="\t\tPath to file for encryption or decryption.")
+    parser.add_argument("-l",   "--list",        help="\t\tPath to file with list for encryption or decryption.")
+    parser.add_argument("-ag",  "--aes_gen",     help="\t\tPath to new AES key.")
+    parser.add_argument("-rg",  "--rsa_gen",     help="\t\tPath to new RSA key pair.")
     
     parser.add_argument("-re",  "--rsa_encrypt",    help="\t\tPath to plain text symmetric key.")
     parser.add_argument("-rpub","--rsa_public",     help="\t\tPath to public key path for RSA encryption.")
@@ -47,45 +47,51 @@ def parse_arguments():
     parser.add_argument("-ae",  "--aes_encrypt", action="store_true", help="\t\tFile to encrypt using AES algorithm and decrypted symmetric key.")
     parser.add_argument("-ad",  "--aes_decrypt", action="store_true", help="\t\tFile to decrypt using AES algorithm.")
     parser.add_argument("-s",   "--save",        action="store_true", help="\t\tSave decrypted content to disk, delete encrypted file, instead of printing to stdout.")
+    parser.add_argument("-v",   "--verbose",     action="store_true", help="\t\tEnable verbose logging output to stdout.")
 
     return parser.parse_args()
 
 
 # Delete old path for preserving the encrypted o decrypted version
-def delete_file(path):
+def delete_file(path, verbose=True):
     if os.path.exists(path):
         try:
             os.remove(path)
-            print(Colors.ORANGE + f"[!] File has been deleted successfully:\t{path}" + Colors.R)
+            if verbose:
+                print(Colors.ORANGE + f"[!] File has been deleted successfully:\t{path}" + Colors.R)
         except Exception as e:
-            print(Colors.RED + f"[x] An error ocurred while removing {path}:\n{e}" + Colors.R)
+            if verbose:
+                print(Colors.RED + f"[x] An error ocurred while removing {path}:\n{e}" + Colors.R)
 
 
 # Compress a file using gzip
-def compress_gzip(input_file):
+def compress_gzip(input_file, verbose=True):
     output_file = input_file + ".gz"
 
     with open(input_file, 'rb') as f_in:
         with gzip.open(output_file, 'wb') as f_out:
             shutil.copyfileobj(f_in, f_out)
 
-    print(Colors.BOLD_WHITE + f"\n[!] File compresses using gzip:\n{output_file}\n" + Colors.R)
+    if verbose:
+        print(Colors.BOLD_WHITE + f"\n[!] File compresses using gzip:\n{output_file}\n" + Colors.R)
     return output_file
 
 
 # Workflow for encrypting or decrypting with AES based in args
 def aes_treat_file(args, symmetric_key, path, enc_path):
+    verbose = args.verbose
     
     if path and not os.path.exists(path):
-        print(Colors.RED + f"[-] Skipping (path not found): {path}" + Colors.R)
+        if verbose:
+            print(Colors.RED + f"[-] Skipping (path not found): {path}" + Colors.R)
         return
 
     ## Case for encrypting using AES and decrypted symmetric key.
     if args.aes_encrypt and path:
-        path_gz = compress_gzip(path)
+        path_gz = compress_gzip(path, verbose=verbose)
         aes_encrypt_file(symmetric_key, path_gz)
-        delete_file(path)
-        delete_file(path_gz)
+        delete_file(path, verbose=verbose)
+        delete_file(path_gz, verbose=verbose)
 
     ## Case for decryption using AES and decrypted symmetric key. 
     elif args.aes_decrypt and path:
@@ -114,21 +120,27 @@ def aes_treat_file(args, symmetric_key, path, enc_path):
                 with open(output_file_path, 'wb') as out_f:
                     out_f.write(decompressed_content)
 
-                print(Colors.GREEN + f"[!] Decrypted and saved: {path} -> {output_file_path}" + Colors.R)
+                if verbose:
+                    print(Colors.GREEN + f"[!] Decrypted and saved: {path} -> {output_file_path}" + Colors.R)
                 
                 # Delete the encrypted source file after successful save
-                delete_file(path)
+                delete_file(path, verbose=verbose)
             
             # Default behavior: print to stdout
             else:
-                print(Colors.GREEN + f"\n[!] Decrypted content from {path}:\n{Colors.R}" + decompressed_content.decode('utf-8'))
+                if verbose:
+                    print(Colors.GREEN + f"\n[!] Decrypted content from {path}:\n{Colors.R}" + decompressed_content.decode('utf-8'))
+                else:
+                    print(decompressed_content.decode('utf-8'), end="")
         
         except Exception as e:
-            print(Colors.RED + f"[-] Error processing {path}: {e}" + Colors.R)
+            if verbose:
+                print(Colors.RED + f"[-] Error processing {path}: {e}" + Colors.R)
 
 
 def main():
     args = parse_arguments()
+    verbose = args.verbose
 
     # Generate a new symmetric AES key
     if args.aes_gen:
@@ -136,7 +148,8 @@ def main():
         key_base64 = base64.b64encode(key).decode('utf-8')
         with open(args.aes_gen, 'w') as file:
             file.write(key_base64)
-            print(Colors.GREEN + f"[!] Key created successfully and saved into:\n{args.aes_gen}" + Colors.R)
+            if verbose:
+                print(Colors.GREEN + f"[!] Key created successfully and saved into:\n{args.aes_gen}" + Colors.R)
         sys.exit(0)
 
     # Generate a new RSA key pair
@@ -157,7 +170,7 @@ def main():
 
         public_key = serialization.load_pem_public_key(public_key)
         rsa_encrypt_path(public_key, args.rsa_encrypt, enc_path)
-        delete_file(args.rsa_encrypt)
+        delete_file(args.rsa_encrypt, verbose=verbose)
         sys.exit(0)
 
     # Case for RSA decryption & AES Operations
@@ -167,7 +180,8 @@ def main():
         if args.rsa_decrypt == "ENV" or args.rsa_decrypt is None:
             enc_path_env = os.getenv("AES_KEY_PATH")
             if not enc_path_env:
-                print(Colors.RED + "[x] Error: AES_KEY_PATH not found in environment." + Colors.R)
+                if verbose:
+                    print(Colors.RED + "[x] Error: AES_KEY_PATH not found in environment." + Colors.R)
                 sys.exit(1)
             enc_path = os.path.expanduser(enc_path_env)
         else:
@@ -177,14 +191,16 @@ def main():
         if args.rsa_private == "ENV" or args.rsa_private is None:
             private_key_env = os.getenv("RSA_KEY_PATH")
             if not private_key_env:
-                print(Colors.RED + "[x] Error: RSA_KEY_PATH not found in environment." + Colors.R)
+                if verbose:
+                    print(Colors.RED + "[x] Error: RSA_KEY_PATH not found in environment." + Colors.R)
                 sys.exit(1)
             private_key_path = os.path.expanduser(private_key_env)
         else:
             private_key_path = args.rsa_private
 
         if not os.path.exists(enc_path) or not os.path.exists(private_key_path):
-            print(Colors.RED + f"[x] Invalid input paths for RSA decryption.\nEncrypted Key: {enc_path}\nPrivate Key: {private_key_path}" + Colors.R)
+            if verbose:
+                print(Colors.RED + f"[x] Invalid input paths for RSA decryption.\nEncrypted Key: {enc_path}\nPrivate Key: {private_key_path}" + Colors.R)
             sys.exit(1)
 
         # Read the private key
@@ -196,7 +212,8 @@ def main():
 
         # Decrypt symmetric key using RSA
         symmetric_key = rsa_decrypt(private_key, encrypted_code)
-        print(f"{Colors.GREEN}[!] RSA decryption success!{Colors.R}")
+        if verbose:
+            print(f"{Colors.GREEN}[!] RSA decryption success!{Colors.R}")
 
         # When -p is provided apply workflow for a single file (resolve relative to original invocation directory)
         if args.path:
