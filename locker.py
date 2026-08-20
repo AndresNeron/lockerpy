@@ -193,17 +193,23 @@ def main():
         symmetric_key = rsa_decrypt(private_key, encrypted_code)
         print(f"{Colors.GREEN}[!] RSA decryption success!{Colors.R}")
 
-        # When -p is provided apply workflow for a single file
+        # When -p is provided apply workflow for a single file (resolve relative to original invocation directory)
         if args.path:
-            aes_treat_file(args, symmetric_key, args.path, enc_path)
+            base_dir = os.getenv("ORIGINAL_PWD", os.getcwd())
+            resolved_path = os.path.abspath(os.path.expanduser(os.path.join(base_dir, args.path)))
+            aes_treat_file(args, symmetric_key, resolved_path, enc_path)
 
         # When -l is provided apply workflow to each file in args.list
-        elif args.list is not None and os.path.exists(args.list):
-            with open(args.list, 'r') as file:
-                for path in file:
-                    path = path.strip()
-                    if path:
-                        aes_treat_file(args, symmetric_key, path, enc_path)
+        elif args.list is not None:
+            base_dir = os.getenv("ORIGINAL_PWD", os.getcwd())
+            list_path = os.path.abspath(os.path.expanduser(os.path.join(base_dir, args.list)))
+            if os.path.exists(list_path):
+                with open(list_path, 'r') as file:
+                    for path in file:
+                        path = path.strip()
+                        if path:
+                            resolved_list_item = os.path.abspath(os.path.join(os.path.dirname(list_path), path))
+                            aes_treat_file(args, symmetric_key, resolved_list_item, enc_path)
 
 
 if __name__ == "__main__":
