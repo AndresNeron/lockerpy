@@ -44,8 +44,10 @@ def parse_arguments():
     parser.add_argument("-rd",  "--rsa_decrypt",    nargs="?", const="ENV", help="\t\tPath to encrypted symmetric key (or uses .env if omitted).")
     parser.add_argument("-rpem","--rsa_private",    nargs="?", const="ENV", help="\t\tPath to private key for RSA decryption (or uses .env if omitted).")
 
-    parser.add_argument("-ae",  "--aes_encrypt", action="store_true", help="\t\tFile to encrypt using AES algorithm and decrypted symmetric key.")
-    parser.add_argument("-ad",  "--aes_decrypt", action="store_true", help="\t\tFile to decrypt using AES algorithm.")
+    # Changed from action="store_true" to nargs="*" to accept one or multiple files/globs
+    parser.add_argument("-ae",  "--aes_encrypt", nargs="*", metavar="FILE", help="\t\tFiles to encrypt using AES algorithm and decrypted symmetric key.")
+    parser.add_argument("-ad",  "--aes_decrypt", nargs="*", metavar="FILE", help="\t\tFiles to decrypt using AES algorithm.")
+    
     parser.add_argument("-s",   "--save",        action="store_true", help="\t\tSave decrypted content to disk, delete encrypted file, instead of printing to stdout.")
     parser.add_argument("-v",   "--verbose",     action="store_true", help="\t\tEnable verbose logging output to stdout.")
 
@@ -78,7 +80,7 @@ def compress_gzip(input_file, verbose=True):
 
 
 # Workflow for encrypting or decrypting with AES based in args
-def aes_treat_file(args, symmetric_key, path, enc_path):
+def aes_treat_file(args, symmetric_key, path, enc_path, is_encryption):
     verbose = args.verbose
     
     if path and not os.path.exists(path):
@@ -87,14 +89,14 @@ def aes_treat_file(args, symmetric_key, path, enc_path):
         return
 
     ## Case for encrypting using AES and decrypted symmetric key.
-    if args.aes_encrypt and path:
+    if is_encryption and path:
         path_gz = compress_gzip(path, verbose=verbose)
         aes_encrypt_file(symmetric_key, path_gz)
         delete_file(path, verbose=verbose)
         delete_file(path_gz, verbose=verbose)
 
     ## Case for decryption using AES and decrypted symmetric key. 
-    elif args.aes_decrypt and path:
+    elif not is_encryption and path:
         decrypted_content = aes_decrypt_file(symmetric_key, path)
 
         if decrypted_content is None:
@@ -173,8 +175,11 @@ def main():
         delete_file(args.rsa_encrypt, verbose=verbose)
         sys.exit(0)
 
+    # Check if AES encrypt or decrypt operations were requested via multi-arg lists
+    is_aes_op = (args.aes_decrypt is not None) or (args.aes_encrypt is not None)
+
     # Case for RSA decryption & AES Operations
-    if (args.rsa_decrypt is not None or args.aes_decrypt or args.aes_encrypt) and not args.rsa_encrypt:
+    if (args.rsa_decrypt is not None or is_aes_op) and not args.rsa_encrypt:
         
         # Resolve Encrypted Symmetric Key path
         if args.rsa_decrypt == "ENV" or args.rsa_decrypt is None:
@@ -215,15 +220,16 @@ def main():
         if verbose:
             print(f"{Colors.GREEN}[!] RSA decryption success!{Colors.R}")
 
-        # When -p is provided apply workflow for a single file (resolve relative to original invocation directory)
+        base_dir = os.getenv("ORIGINAL_PWD", os.getcwd())
+
+        # When -p is provided apply workflow for a single file
         if args.path:
-            base_dir = os.getenv("ORIGINAL_PWD", os.getcwd())
             resolved_path = os.path.abspath(os.path.expanduser(os.path.join(base_dir, args.path)))
-            aes_treat_file(args, symmetric_key, resolved_path, enc_path)
+            is_enc = args.aes_encrypt is not None
+            aes_treat_file(args, symmetric_key, resolved_path, enc_path, is_encryption=is_enc)
 
         # When -l is provided apply workflow to each file in args.list
         elif args.list is not None:
-            base_dir = os.getenv("ORIGINAL_PWD", os.getcwd())
             list_path = os.path.abspath(os.path.expanduser(os.path.join(base_dir, args.list)))
             if os.path.exists(list_path):
                 with open(list_path, 'r') as file:
@@ -231,7 +237,19 @@ def main():
                         path = path.strip()
                         if path:
                             resolved_list_item = os.path.abspath(os.path.join(os.path.dirname(list_path), path))
-                            aes_treat_file(args, symmetric_key, resolved_list_item, enc_path)
+                            is_enc = args.aes_encrypt is not None
+                            aes_treat_file(args, symmetric_key, resolved_list_item, enc_path, is_encryption=is_enc)
+
+        # When multiple files are passed directly via -ad / -ae (e.g., accounts/*enc)
+        elif args.aes_decrypt is not None:
+            for file_arg in args.aes_decrypt:
+                resolved_path = os.path.abspath(os.path.expanduser(os.path.join(base_dir, file_arg)))
+                aes_treat_file(args, symmetric_key, resolved_path, enc_path, is_encryption=False)
+
+        elif args.aes_encrypt is not None:
+            for file_arg in args.aes_encrypt:
+                resolved_path = os.path.abspath(os.path.expanduser(os.path.join(base_dir, file_arg)))
+                aes_treat_file(args, symmetric_key, resolved_path, enc_path, is_encryption=True)
 
 
 if __name__ == "__main__":

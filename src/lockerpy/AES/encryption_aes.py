@@ -76,7 +76,7 @@ def aes_encrypt_file(key, file_path):
         key = base64.b64decode(key)
 
         # Encrypt the message
-        print(Colors.ORANGE + f"[!] Encrypting with AES:\t{file_path}\n" + Colors.R)
+        #print(Colors.ORANGE + f"[!] Encrypting with AES:\t{file_path}\n" + Colors.R)
         encrypted_content = encrypt_message(key, plaintext)
 
         # Encode the encrypted content again
@@ -86,7 +86,7 @@ def aes_encrypt_file(key, file_path):
         encrypted_file = file_path + ".enc"
         with open(encrypted_file, 'w') as file:
             file.write(encrypted_content)
-            print(Colors.GREEN + f"\n[!] Encrypted result saved into:\t{encrypted_file}\n" + Colors.R)
+            #print(Colors.GREEN + f"\n[!] Encrypted result saved into:\t{encrypted_file}\n" + Colors.R)
 
 
 # Main script
