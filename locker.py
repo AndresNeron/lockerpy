@@ -41,6 +41,7 @@ def parse_arguments():
 
     parser.add_argument("-ae",  "--aes_encrypt", action="store_true", help="\t\tFile to encrypt using AES algorithm and decrypted symmetric key.")
     parser.add_argument("-ad",  "--aes_decrypt", action="store_true", help="\t\tFile to decrypt using AES algorithm.")
+    parser.add_argument("-s",   "--save",        action="store_true", help="\t\tSave decrypted content to disk, delete encrypted file, instead of printing to stdout.")
 
     return parser.parse_args()
 
@@ -71,6 +72,7 @@ def compress_gzip(input_file):
 def aes_treat_file(args, symmetric_key, path, enc_path):
     
     if path and not os.path.exists(path):
+        print(Colors.RED + f"[-] Skipping (path not found): {path}" + Colors.R)
         return
 
     ## Case for encrypting using AES and decrypted symmetric key.
@@ -84,14 +86,40 @@ def aes_treat_file(args, symmetric_key, path, enc_path):
     elif args.aes_decrypt and path:
         decrypted_content = aes_decrypt_file(symmetric_key, path)
 
+        if decrypted_content is None:
+            return
+
         try:
+            # Decompress the gzip layer inside the decrypted content
             with gzip.GzipFile(fileobj=BytesIO(decrypted_content)) as gz:
                 decompressed_content = gz.read()
             
-            print(Colors.GREEN + f"\n[!] Decrypted content from {path} is:\n{Colors.R}{decompressed_content.decode()}\n" + Colors.R)
+            # If the save flag (-s) is enabled, write to disk and remove encrypted source
+            if args.save:
+                if path.endswith(".enc"):
+                    output_file_path = path[:-4]  # removes .enc -> filename.json.gz (or filename.json)
+                elif path.endswith(".bin"):
+                    output_file_path = path[:-4]
+                else:
+                    output_file_path = path + ".decrypted"
+
+                if output_file_path.endswith(".gz"):
+                    output_file_path = output_file_path[:-3]
+
+                with open(output_file_path, 'wb') as out_f:
+                    out_f.write(decompressed_content)
+
+                print(Colors.GREEN + f"[!] Decrypted and saved: {path} -> {output_file_path}" + Colors.R)
+                
+                # Delete the encrypted source file after successful save
+                delete_file(path)
+            
+            # Default behavior: print to stdout
+            else:
+                print(Colors.GREEN + f"\n[!] Decrypted content from {path}:\n{Colors.R}" + decompressed_content.decode('utf-8'))
         
         except Exception as e:
-            print(Colors.RED + f"[-] Error: {e}" + Colors.R)
+            print(Colors.RED + f"[-] Error processing {path}: {e}" + Colors.R)
 
 
 def main():
@@ -130,7 +158,7 @@ def main():
     # Case for RSA decryption & AES Operations
     if (args.rsa_decrypt is not None or args.aes_decrypt or args.aes_encrypt) and not args.rsa_encrypt:
         
-        # Resolve Encrypted Symmetric Key path (Fix: do not append .enc twice)
+        # Resolve Encrypted Symmetric Key path
         if args.rsa_decrypt == "ENV" or args.rsa_decrypt is None:
             enc_path_env = os.getenv("AES_KEY_PATH")
             if not enc_path_env:
@@ -174,7 +202,8 @@ def main():
             with open(args.list, 'r') as file:
                 for path in file:
                     path = path.strip()
-                    aes_treat_file(args, symmetric_key, path, enc_path)
+                    if path:
+                        aes_treat_file(args, symmetric_key, path, enc_path)
 
 
 if __name__ == "__main__":

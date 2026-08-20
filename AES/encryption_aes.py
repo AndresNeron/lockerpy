@@ -80,7 +80,7 @@ def aes_encrypt_file(key, file_path):
         encrypted_content = base64.b64encode(encrypted_content).decode('utf-8')
 
         # Save the encrypted file
-        encrypted_file = file_path + ".bin"
+        encrypted_file = file_path + ".enc"
         with open(encrypted_file, 'w') as file:
             file.write(encrypted_content)
             print(Colors.GREEN + f"\n[!] Encrypted result saved into:\t{encrypted_file}\n" + Colors.R)
@@ -110,7 +110,7 @@ if __name__ == "__main__":
     if key_dir and not os.path.exists(key_dir):
         os.makedirs(key_dir, exist_ok=True)
 
-    encrypted_message_file_path = input_file_path + ".bin"
+    encrypted_message_file_path = input_file_path + ".enc"
 
     # Read the plaintext message from a file
     with open(input_file_path, 'rb') as file:
