@@ -1,0 +1,25 @@
+*pyc*
+*enc
+*pem
+*pub
+*bin
+*csv
+*json
+*enc_paths*
+*payload*
+cipher.sh
+*.env
+*cache*
+*log
+
+# Python build artifacts and egg-info
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+build/
+dist/
+.eggs/
+
+# Virtual environments
+cipherEnv/
