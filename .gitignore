@@ -11,6 +11,7 @@ cipher.sh
 *.env
 *cache*
 *log
+*accounts*
 
 # Python build artifacts and egg-info
 __pycache__/
