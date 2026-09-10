@@ -11,7 +11,7 @@ MAIN_SCRIPT="src/lockerpy/locker.py"  # Relative path to the executable entry po
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 echo "==> Creating virtual environment ($VENV_NAME)..."
-python3 -m venv "$PROJECT_DIR/$VENV_NAME"
+virtualenv "$PROJECT_DIR/$VENV_NAME" --python=3
 
 echo "==> Installing dependencies..."
 source "$PROJECT_DIR/$VENV_NAME/bin/activate"
