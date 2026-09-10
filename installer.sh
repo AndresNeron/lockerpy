@@ -23,14 +23,20 @@ fi
 echo "==> Generating global wrapper script..."
 WRAPPER_PATH="/usr/local/bin/$APP_NAME"
 
-# Write the wrapper script (requires sudo/root privileges)
-sudo tee "$WRAPPER_PATH" > /dev/null <<EOF
+# Write the wrapper script using quoted 'EOF' to preserve internal variables
+sudo tee "$WRAPPER_PATH" > /dev/null << 'EOF'
 #!/bin/bash
-export ORIGINAL_PWD="\$PWD"
-cd "$PROJECT_DIR"
-source "$VENV_NAME/bin/activate"
-exec python3 "$MAIN_SCRIPT" "\$@"
+export ORIGINAL_PWD="$PWD"
+cd "__PROJECT_DIR__"
+source "__VENV_NAME__/bin/activate"
+export PYTHONPATH="__PROJECT_DIR__/src"
+exec python3 -m __PYTHON_MODULE__ "$@"
 EOF
+
+# Inject the actual variable values into the wrapper template
+sudo sed -i "s|__PROJECT_DIR__|$PROJECT_DIR|g" "$WRAPPER_PATH"
+sudo sed -i "s|__VENV_NAME__|$VENV_NAME|g" "$WRAPPER_PATH"
+sudo sed -i "s|__PYTHON_MODULE__|$PYTHON_MODULE|g" "$WRAPPER_PATH"
 
 sudo chmod +x "$WRAPPER_PATH"
 
