@@ -5,6 +5,7 @@ set -e
 APP_NAME="locker"                     # Name of the global command (e.g., /usr/local/bin/locker)
 VENV_NAME="cipherEnv"                 # Virtual environment folder name
 MAIN_SCRIPT="src/lockerpy/locker.py"  # Relative path to the executable entry point
+PYTHON_MODULE="lockerpy.locker"       # Python module entry point for python3 -m
 # ---------------------
 
 # Determine absolute project path from where installer is run
