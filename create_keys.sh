@@ -17,7 +17,7 @@ locker -rg lockerpy/src/lockerpy/RSA/lock
 locker -re AES_keys/aes_key1 -rpub src/lockerpy/RSA/lock_pem.pub
 
 # Setup the .env to start ciphering content
-cat << EOF > '.env'
+cat << EOF > .env
 AES_KEY_PATH=$PARENT_PATH/AES_keys/aes_key1.enc
 RSA_KEY_PATH=$PARENT_PATH/lockerpy/src/lockerpy/RSA/lock.pem
-EOF 
+EOF
