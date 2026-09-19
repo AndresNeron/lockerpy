@@ -14,7 +14,7 @@ locker -ag AES_keys/aes_key1
 locker -rg lockerpy/src/lockerpy/RSA/lock
 
 # Cipher AES key with RSA public key
-locker -re AES_keys/aes_key1 -rpub src/lockerpy/RSA/lock_pem.pub
+locker -re AES_keys/aes_key1 -rpub src/lockerpy/RSA/lock.pub
 
 # Setup the .env to start ciphering content
 cat << EOF > .env
