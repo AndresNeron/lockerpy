@@ -26,7 +26,6 @@ This program is ideal for users who need to secure their data or manage encrypti
 - **Generate Keys**: Create new AES and RSA keys for encryption.
 - **Encrypt/Decrypt Files**: Encrypt files using AES with RSA-encrypted symmetric keys and decrypt them accordingly.
 - **Batch Processing**: Encrypt or decrypt multiple files listed in a text file.
-- **Logging**: Track encryption activities in `key_logs.csv` for future reference.
 
 ## <a name="usage"></a>Usage
 
