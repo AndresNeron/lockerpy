@@ -58,49 +58,49 @@ Here are some examples of how to use the script:
 - Generate a new AES key:
 
 ```bash
-sudo ./locker.py -ag AES_keys/aes_key1
+./locker.py -ag AES_keys/aes_key1
 ```
 
 - Generate a new RSA key pair:
 
 ```bash
-sudo ./locker.py -rg RSA/lock
+./locker.py -rg RSA/lock
 ```
 
 - Encrypt an AES key using RSA:
 
 ```bash
-sudo ./locker.py -re AES_keys/aes_key1 -rpub RSA/lock_pem.pub
+./locker.py -re AES_keys/aes_key1 -rpub RSA/lock_pem.pub
 ```
 
 - Decrypt an AES key using RSA:
 
 ```bash
-sudo ./locker.py -rd AES_keys/aes_key1.enc -rpem RSA/lock.pem
+./locker.py -rd AES_keys/aes_key1.enc -rpem RSA/lock.pem
 ```
 
 - Decrypt an AES key and then encrypt a file using AES:
 
 ```bash
-sudo ./locker.py -rd AES_keys/aes_key1.enc -rpem RSA/lock.pem -ae -p books/important_book.pdf
+./locker.py -rd AES_keys/aes_key1.enc -rpem RSA/lock.pem -ae -p books/important_book.pdf
 ```
 
 - Decrypt an AES key and then decrypt a file using AES:
 
 ```bash
-sudo ./locker.py -rd AES_keys/aes_key1.enc -rpem RSA/lock.pem -ad -p books/important_book.pdf.gz.bin
+./locker.py -rd AES_keys/aes_key1.enc -rpem RSA/lock.pem -ad -p books/important_book.pdf.gz.bin
 ```
 
 - Decrypt an AES key and then encrypt a list of paths using AES:
 
 ```bash
-sudo ./locker.py -rd AES_keys/aes_key1.enc -rpem RSA/lock.pem -ae -l samples/paths_for_encryption
+./locker.py -rd AES_keys/aes_key1.enc -rpem RSA/lock.pem -ae -l samples/paths_for_encryption
 ```
 
 - Decrypt an AES key using RSA and then decrypt a list of paths using AES:
 
 ```bash
-sudo ./locker.py -rd AES_keys/aes_key1.enc -rpem RSA/lock.pem -ad -l samples/paths_for_decryption
+./locker.py -rd AES_keys/aes_key1.enc -rpem RSA/lock.pem -ad -l samples/paths_for_decryption
 ```
 
 ## <a name="installation"></a>Installation
